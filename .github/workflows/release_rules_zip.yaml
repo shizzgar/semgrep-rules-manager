@@ -1,0 +1,36 @@
+name: Release rules zip
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-rules-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Python
+        uses: actions/setup-python@v4
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@437d4fa27baf74d89b789ba2d8cae97dd2365feb
+      - name: Setup a local virtual environment
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - name: Install the project dependencies
+        run: poetry install --only=main
+      - name: Download rules
+        run: |
+          mkdir -p rules
+          poetry run semgrep-rules-manager --dir rules download
+      - name: Create rules zip
+        run: |
+          find rules -type d -name .git -prune -exec rm -rf {} +
+          cd rules
+          zip -r ../semgrep-rules.zip .
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: semgrep-rules.zip
