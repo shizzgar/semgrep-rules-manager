@@ -1,6 +1,8 @@
+import json
 import os
 import re
 import shutil
+import tempfile
 import typing
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -134,36 +136,70 @@ class Source:
         if self.is_downloaded:
             self.local_commit = self._get_last_local_commit()
             self.remote_commit = self._get_last_remote_commit()
-            self.is_synced = self.local_commit == self.remote_commit
+            self.is_synced = (
+                self.local_commit is not None
+                and self.remote_commit is not None
+                and self.local_commit == self.remote_commit
+            )
 
     def _get_last_local_commit(self) -> str:
-        repo = git.Repo(self.location)
+        metadata = self._load_metadata()
+        return metadata.get(self.identifier, {}).get("local_commit")
 
-        return repo.head.object.hexsha
+    def _set_last_local_commit(self, commit_hash: str) -> None:
+        metadata = self._load_metadata()
+        entry = metadata.get(self.identifier, {})
+        entry["local_commit"] = commit_hash
+        metadata[self.identifier] = entry
+        self._write_metadata(metadata)
 
     def _get_last_remote_commit(self) -> str:
-        repo = git.Repo(self.location)
+        try:
+            output = git.Git().ls_remote(self.repo_url, self.repo_brach)
+        except git.GitCommandError:
+            return None
 
-        origin = repo.remotes.origin
-        origin.fetch()
+        if not output:
+            return None
 
-        return repo.rev_parse("origin/" + self.repo_brach).hexsha
+        return output.split()[0]
+
+    def _load_metadata(self) -> typing.Dict[str, typing.Dict[str, str]]:
+        metadata_path = self._metadata_path()
+        if not os.path.isfile(metadata_path):
+            return {}
+
+        with open(metadata_path, "r", encoding="utf-8") as metadata_file:
+            return json.load(metadata_file)
+
+    def _write_metadata(
+        self, metadata: typing.Dict[str, typing.Dict[str, str]]
+    ) -> None:
+        metadata_path = self._metadata_path()
+        with open(metadata_path, "w", encoding="utf-8") as metadata_file:
+            json.dump(metadata, metadata_file, indent=2, sort_keys=True)
+
+    def _metadata_path(self) -> str:
+        return os.path.join(
+            os.path.dirname(self.location), ".semgrep_rules_manager_metadata.json"
+        )
 
     def download(self) -> None:
-        git.Repo.clone_from(self.repo_url, self.location, multi_options=["--depth=1"])
+        self._materialize_rule_files()
 
-        self._preprocess()
-        self._remove_ignored()
-
-    def _preprocess(self) -> None:
+    def _preprocess(self, location: str = None) -> None:
+        target_location = location or self.location
         for preprocessor_id in self.preprocessors_ids:
-            preprocessor = PreprocessorsFactory.create(preprocessor_id, self.location)
+            preprocessor = PreprocessorsFactory.create(
+                preprocessor_id, target_location
+            )
 
             preprocessor.preprocess()
 
-    def _remove_ignored(self) -> None:
+    def _remove_ignored(self, location: str = None) -> None:
+        target_location = location or self.location
         for current_ignored in self.ignored:
-            path = os.path.join(self.location, current_ignored)
+            path = os.path.join(target_location, current_ignored)
 
             if os.path.isfile(path):
                 os.remove(path)
@@ -171,14 +207,15 @@ class Source:
                 shutil.rmtree(path)
 
     def update(self) -> None:
-        repo = git.Repo(self.location)
-        origin = repo.remotes.origin
-        origin.pull()
-        self._remove_ignored()
+        self._materialize_rule_files()
 
     def remove(self) -> None:
         if self.is_downloaded:
             shutil.rmtree(self.location)
+            metadata = self._load_metadata()
+            if self.identifier in metadata:
+                metadata.pop(self.identifier)
+                self._write_metadata(metadata)
 
     def count_all_rules(self) -> int:
         per_language_count = self.count_rules(beautified=False)
@@ -217,6 +254,55 @@ class Source:
                     continue
                 else:
                     yield rule_file
+
+    def _iter_rule_file_paths(
+        self, location: str
+    ) -> typing.Generator[pathlib.Path, None, None]:
+        for fn in pathlib.Path(location).rglob("*"):
+            if (
+                fn.name.endswith(".yaml") or fn.name.endswith(".yml")
+            ) and not fn.name.startswith("."):
+                try:
+                    RulesFile(fn.resolve())
+                except SemgrepRulesManagerException:
+                    continue
+                else:
+                    yield fn
+
+    def _materialize_rule_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo = git.Repo.clone_from(
+                self.repo_url,
+                temp_dir,
+                branch=self.repo_brach,
+                multi_options=["--depth=1"],
+            )
+            commit_hash = repo.head.object.hexsha
+            self._preprocess(temp_dir)
+            self._remove_ignored(temp_dir)
+            rule_files = list(self._iter_rule_file_paths(temp_dir))
+            self._replace_with_rule_files(temp_dir, rule_files)
+            self._set_last_local_commit(commit_hash)
+            self.local_commit = commit_hash
+            self.remote_commit = self._get_last_remote_commit()
+            self.is_synced = (
+                self.local_commit is not None
+                and self.remote_commit is not None
+                and self.local_commit == self.remote_commit
+            )
+
+    def _replace_with_rule_files(
+        self, temp_dir: str, rule_files: typing.List[pathlib.Path]
+    ) -> None:
+        if os.path.isdir(self.location):
+            shutil.rmtree(self.location)
+        os.makedirs(self.location, exist_ok=True)
+        base_path = pathlib.Path(temp_dir)
+        for rule_file in rule_files:
+            relative_path = rule_file.relative_to(base_path)
+            destination = pathlib.Path(self.location) / relative_path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(rule_file, destination)
 
 
 def read_sources(
