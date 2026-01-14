@@ -55,8 +55,54 @@ class IDStandardizationPreprocessor(Preprocessor):
                     yield os.path.join(root, file)
 
 
+class SeverityNormalizationPreprocessor(Preprocessor):
+    IDENTIFIER = "severity-normalization"
+
+    SEVERITY_MAP = {
+        "CRITICAL": "ERROR",
+        "HIGH": "ERROR",
+        "MEDIUM": "WARNING",
+        "LOW": "INFO",
+    }
+
+    def __init__(self, location: str):
+        super().__init__(location)
+
+    def preprocess(self) -> None:
+        for file in self._get_all_yaml_files():
+            self.process_content(file)
+
+    def process_content(self, filename: str) -> None:
+        with open(filename, "r+", encoding="utf-8") as file:
+            content = file.read()
+
+            def replace_severity(match: re.Match) -> str:
+                severity = match.group(2).upper()
+                replacement = self.SEVERITY_MAP.get(severity, severity)
+                return f"{match.group(1)}{replacement}"
+
+            new_content = re.sub(
+                r"(\bseverity:\s*)(CRITICAL|HIGH|MEDIUM|LOW)\b",
+                replace_severity,
+                content,
+            )
+
+            if new_content != content:
+                file.seek(0)
+                file.truncate()
+                file.write(new_content)
+
+    def _get_all_yaml_files(self) -> typing.Generator[str, None, None]:
+        for root, _, files in os.walk(self.location):
+            for file in files:
+                if (
+                    file.endswith(".yaml") or file.endswith(".yml")
+                ) and not file.startswith("."):
+                    yield os.path.join(root, file)
+
+
 class PreprocessorsFactory:
-    known_preprocessors = [IDStandardizationPreprocessor]
+    known_preprocessors = [IDStandardizationPreprocessor, SeverityNormalizationPreprocessor]
 
     @staticmethod
     def create(identifier: str, location: str) -> Preprocessor:
