@@ -1,5 +1,5 @@
 community:
-  description: Official repository of rules
+  description: Official Semgrep community rules repository
   repository_url: https://github.com/returntocorp/semgrep-rules
   repository_branch: develop
   ignored:
@@ -9,7 +9,7 @@ community:
   author: Semgrep
   license: LGPL 2.1
 gitlab:
-  description: Rules used in GitLab SAST
+  description: Semgrep ruleset used by GitLab SAST
   repository_url: https://gitlab.com/gitlab-org/security-products/sast-rules
   repository_branch: main
   ignored:
@@ -25,19 +25,19 @@ gitlab:
   preprocessors:
     - id-standardization
 trailofbits:
-  description: Rules used in the audits, research, and projects of Trail of Bits
+  description: Trail of Bits audit, research, and project rules
   repository_url: https://github.com/trailofbits/semgrep-rules
   repository_branch: main
   author: Trail of Bits
   license: AGPL-3.0
 "0xdea":
-  description: Custom rules written by Marco Ivaldi
+  description: Custom rules by Marco Ivaldi
   repository_url: https://github.com/0xdea/semgrep-rules
   repository_branch: main
   author: Marco Ivaldi
   license: MIT
 elttam:
-  description: Custom rules used in elttam
+  description: Semgrep rules used by elttam
   repository_url: https://github.com/elttam/semgrep-rules
   repository_branch: main
   ignored:
@@ -46,56 +46,245 @@ elttam:
   author: elttam
   license: MIT
 kondukto:
-  description: Custom rules used in Kondukto
+  description: Semgrep rules maintained by Kondukto
   repository_url: https://github.com/kondukto-io/semgrep-rules
   repository_branch: master
   author: Kondukto
   license:
 dgryski:
-  description: Custom Go rules
+  description: Go-focused Semgrep rules
   repository_url: https://github.com/dgryski/semgrep-go
   repository_branch: master
   author: Damian Gryski
   license: MIT
 dotta:
-  description: Rules developed while doing pentest on web and mobile apps
+  description: Web and mobile pentest rules by Federico Dotta
   repository_url: https://github.com/federicodotta/semgrep-rules
   repository_branch: main
   author: Federico Dotta
   license: MIT
 hashicorp:
-  description: HashiCorp-related rules
+  description: HashiCorp-related Semgrep rules
   repository_url: https://github.com/hashicorp-forge/semgrep-rules
   repository_branch: main
   author: Hashicorp
   license: MPL-2.0
 decurity:
-  description: Rules for smart contracts based on DeFi exploits
+  description: Smart contract rules based on DeFi exploits
   repository_url: https://github.com/decurity/semgrep-smart-contracts
   repository_branch: master
   author: Decurity
   license: CC BY-NC-SA 4.0
 mindedsecurity:
-  description: Rules derived from the OWASP MASTG for Android applications
+  description: Android rules derived from the OWASP MASTG
   repository_url: https://github.com/mindedsecurity/semgrep-rules-android-security
   repository_branch: main
   author: mindedsecurity
   license: GPL3
 akabe1:
-  description: Custom Swift, Java, and Cobol rules
+  description: Custom Swift, Java, and Cobol Semgrep rules
   repository_url: https://github.com/akabe1/akabe1-semgrep-rules
   repository_branch: main
   author: akabe1
   license:
 atlassian-labs:
-  description: Atlassian-maintained Semgrep rules
+  description: Semgrep rules maintained by Atlassian Labs
   repository_url: https://github.com/atlassian-labs/atlassian-sast-ruleset
   repository_branch: main
   author: atlassian-labs
   license: LGPL 2.1
 apiiro:
-  description: Ruleset focused on malicious code, with a high protection-to-noise ratio
+  description: Malicious-code ruleset with a high protection-to-noise ratio
   repository_url: https://github.com/apiiro/malicious-code-ruleset
   repository_branch: main
   author: apiiro
   license: MIT
+mastg:
+  description: OWASP MASTG repository with mobile security resources
+  repository_url: https://github.com/OWASP/mastg
+  repository_branch: master
+  ignored:
+    - Document/metadata.yml
+    - demos/android/MASVS-PRIVACY/MASTG-DEMO-0081/flow.yaml
+    - rules/mastg-android-debuggable-flag.yml
+  author: OWASP
+  license: CC-BY-SA-4.0
+fullstorydev:
+  description: Semgrep rules maintained by FullStory
+  repository_url: https://github.com/fullstorydev/semgrep-rules
+  repository_branch: main
+  author: fullstorydev
+  license:
+patched-codes:
+  description: Permissively licensed Semgrep rules collection
+  repository_url: https://github.com/patched-codes/semgrep-rules
+  repository_branch: main
+  author: patched-codes
+  license: MIT
+j3ssie:
+  description: Curated community Semgrep rules collection
+  repository_url: https://github.com/j3ssie/curated-semgrep-rules
+  repository_branch: main
+  ignored:
+    - rules/elttam/yaml/github-actions/security/save-state.test.yaml
+    - rules/elttam/yaml/github-actions/security/set-output.test.yaml
+    - rules/elttam/yaml/kubernetes/audit/network-policy-ingress-any.test.yaml
+    - rules/elttam/yaml/kubernetes/audit/privileged-container.test.yaml
+    - rules/elttam/yaml/kubernetes/security/allow-privilege-escalation.test.yaml
+    - rules/elttam/yaml/kubernetes/security/no-security-context.test.yaml
+    - rules/elttam/yaml/kubernetes/security/run-as-non-root-unsafe-value.test.yaml
+    - rules/elttam/yaml/kubernetes/security/run-as-non-root.test.yaml
+  author: j3ssie
+  license:
+dipa96:
+  description: Static application security testing rules for Semgrep
+  repository_url: https://github.com/dipa96/semgrep-rules
+  repository_branch: main
+  author: dipa96
+  license:
+tuannq2299:
+  description: .NET and Java rules aligned with security guidelines
+  repository_url: https://github.com/tuannq2299/semgrep-rules
+  repository_branch: master
+  ignored:
+    - Java/Dos1.yaml
+    - csharp/CA5382.yaml
+    - csharp/CA5383.yaml
+    - csharp/CA5385_1.yaml
+    - csharp/CA5389.yaml
+  author: tuannq2299
+  license:
+frappe:
+  description: Semgrep rules for the Frappe Framework
+  repository_url: https://github.com/frappe/semgrep-rules
+  repository_branch: develop
+  author: frappe
+  license: MIT
+packtdev:
+  description: Semgrep rules used to enforce coding standards
+  repository_url: https://github.com/PacktDev/semgrep-rules
+  repository_branch: main
+  author: PacktDev
+  license:
+vmnguyen:
+  description: Personal Semgrep rules collection
+  repository_url: https://github.com/vmnguyen/semgrep-rules
+  repository_branch: master
+  author: vmnguyen
+  license:
+saleor:
+  description: Semgrep rules maintained by Saleor team
+  repository_url: https://github.com/saleor/semgrep-rules
+  repository_branch: main
+  ignored:
+    - yaml/github-actions/security/audit/shell-script-injection.test.yaml
+  author: saleor
+  license: BSD-3-Clause
+doyensec:
+  description: Unsafe-unpacking rules from Doyensec
+  repository_url: https://github.com/doyensec/Unsafe-Unpacking
+  repository_branch: main
+  author: doyensec
+  license:
+lambdasec:
+  description: Autogrep rule generation artifacts by LambdaSec
+  repository_url: https://github.com/lambdasec/autogrep
+  repository_branch: main
+  author: lambdasec
+  license: Apache-2.0
+imfht:
+  description: Personal Semgrep rules by imfht
+  repository_url: https://github.com/imfht/my-semgrep-rules
+  repository_branch: master
+  author: imfht
+  license:
+s0rcy:
+  description: Semgrep rules for security analysis by s0rcy
+  repository_url: https://github.com/s0rcy/semgrep-rules
+  repository_branch: main
+  author: s0rcy
+  license: MIT
+codevigilant:
+  description: CodeVigilant Semgrep rules for bug hunting
+  repository_url: https://github.com/CodeVigilant/codevigilant_semgrep_rules
+  repository_branch: main
+  author: CodeVigilant
+  license: MIT
+fxc233:
+  description: Semgrep rules by fxc233
+  repository_url: https://github.com/fxc233/semgrep-rules
+  repository_branch: main
+  author: fxc233
+  license:
+eldstal:
+  description: Custom Semgrep rules by eldstal
+  repository_url: https://github.com/eldstal/semgrep-rules
+  repository_branch: main
+  author: eldstal
+  license:
+safeack:
+  description: Semgrep rules maintained by SafeAck
+  repository_url: https://github.com/SafeAck/semgrep-rules
+  repository_branch: main
+  author: SafeAck
+  license:
+iter-malum:
+  description: C/C++ Semgrep rules for common vulnerability patterns
+  repository_url: https://github.com/iter-malum/semgrep_rules
+  repository_branch: main
+  author: iter-malum
+  license:
+zeeshansultan:
+  description: Critical PHP rules with WordPress sanitizers
+  repository_url: https://github.com/ZeeshanSultan/semgrep-php-critical-rules
+  repository_branch: main
+  author: ZeeshanSultan
+  license:
+mind2hex:
+  description: Semgrep rules for vulnerability scanning by mind2hex
+  repository_url: https://github.com/mind2hex/semgrep_rules
+  repository_branch: main
+  preprocessors:
+    - severity-normalization
+  author: mind2hex
+  license:
+rahmansec:
+  description: Semgrep rules collection by rahmansec
+  repository_url: https://github.com/rahmansec/Semgrep-Ruls
+  repository_branch: master
+  author: rahmansec
+  license:
+swieja:
+  description: Personal Semgrep rules by swieja
+  repository_url: https://github.com/swieja/my_semgrep_rules
+  repository_branch: master
+  ignored:
+    - go_semgrep_rules/handler-assignment-from-multiple-sources.yaml
+  author: swieja
+  license:
+convisolabs:
+  description: Semgrep rules pack by Conviso Labs
+  repository_url: https://github.com/convisolabs/semgrep_rules
+  repository_branch: main
+  ignored:
+    - shellscript_baseline.yaml
+  author: convisolabs
+  license:
+insideapp-oss:
+  description: Mobile app rules inspired by OWASP MASTG
+  repository_url: https://github.com/insideapp-oss/mobile-application-security-rules
+  repository_branch: main
+  author: insideapp-oss
+  license:
+parsiya:
+  description: Semgrep hotspot rules by parsiya
+  repository_url: https://github.com/parsiya/semgrep-hotspots
+  repository_branch: main
+  author: parsiya
+  license:
+docfate111:
+  description: Semgrep rules and CodeQL queries by docfate111
+  repository_url: https://github.com/docfate111/static-analysis-rules
+  repository_branch: main
+  author: docfate111
+  license:
